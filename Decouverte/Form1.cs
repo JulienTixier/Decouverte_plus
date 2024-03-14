@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace Decouverte
 {
 
@@ -25,27 +26,35 @@ namespace Decouverte
         public Form1()
         {
             InitializeComponent();
-            List<Actions> actions = new List<Actions>();
-            Actions Thales = new Actions("Thales", 134);
+            valportefeuillestr.Text = "0€";
             actions.Add(Thales);
-            actionslist.Items.Add(Thales.name);
-            Actions Schneider = new Actions("Schneider", 195);
             actions.Add(Schneider);
-            actionslist.Items.Add(Schneider.name);
-            Actions Vinci = new Actions("Vinci", 116);
             actions.Add(Vinci);
-            actionslist.Items.Add(Vinci.name);
-            Actions LVMH = new Actions("LVMH", 822);
             actions.Add(LVMH);
-            actionslist.Items.Add(LVMH.name);
-            Actions TotalEnergies = new Actions("TotalEnergies", 60);
             actions.Add(TotalEnergies);
-            actionslist.Items.Add(TotalEnergies.name);
-            Actions Sanofi = new Actions("Sanofi", 86);
             actions.Add(Sanofi);
-            actionslist.Items.Add(Sanofi.name);
-            Portefeuille portf = new Portefeuille(0, actions);
+            for(int i=0; i<actions.Count; i++)
+            {
+                actionslist.Items.Add(actions[i].name);
+                
+            }
+            portf.UpdateConstr();
 
+
+        }
+
+        public static List<Actions> actions = new List<Actions>();
+        public Actions Thales = new Actions("Thales", /*134*/10);
+        public Actions Schneider = new Actions("Schneider", /*195*/10);
+        public Actions Vinci = new Actions("Vinci", /*116*/10);
+        public Actions LVMH = new Actions("LVMH", /*822*/10);
+        public Actions TotalEnergies = new Actions("TotalEnergies", /*60*/10);
+        public Actions Sanofi = new Actions("Sanofi", /*86*/10);
+        public Portefeuille portf = new Portefeuille(0, actions);
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+         
 
         }
 
@@ -62,20 +71,57 @@ namespace Decouverte
         private void button1_Click(object sender, EventArgs e)
         {
             string strnombres_actions = nbactions.Text;
-            int nb_actions = (int)strnombres_actions;
+            int nb_actions = Convert.ToInt32(strnombres_actions);
             string nom_actions = actionslist.SelectedItem.ToString();
-            portefeuille.Items.Add(nombres_actions + " " + nom_actions);
-            
-           
+            portf.total = 0;
+            for (int i =0;i < portf.actions.Count; i++)
+            {
+                if(nom_actions == portf.actions[i].name)
+                {
+                    if (portf.nbactions[i] == 0)
+                    {
+                        portf.nbactions[i] += nb_actions;
+                        portefeuille.Items.Add(portf.nbactions[i] + " " + portf.actions[i].name);
+                    }
+                    else
+                    {
+                        portefeuille.Items.Remove(portf.nbactions[i] + " " + portf.actions[i].name);
+                        portf.nbactions[i] += nb_actions;
+                        portefeuille.Items.Add(portf.nbactions[i] + " " + portf.actions[i].name);
+
+                    }
+
+                }
+                portf.total += portf.actions[i].price * portf.nbactions[i];
+            }
+            valportefeuillestr.Text = portf.total.ToString() + "€";
+            portf.Updatepercactions();
+            portf.Charmaker(repartactifs);
+
+
+
+
+
+
+
+
+
+
+
 
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
-
+            
         }
 
         private void portefeuille_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chart1_Click(object sender, EventArgs e)
         {
 
         }
@@ -107,22 +153,64 @@ namespace Decouverte
 
     public class Portefeuille
     {
-        public float total;
+        public double total;
         public List<int> nbactions;
         public List<Actions> actions;
+        public List<double> percactions;
 
         public Portefeuille(float tot,List<Actions> acts)
         {
             total = tot;
-            nbactions = new List<int>(6);
             actions = acts;
-
         }
 
-        public void Ajoutnbactions(int pos,int nb)
+        public void UpdateConstr()
         {
-            nbactions.Insert(pos, nb);
+            nbactions = new List<int>(actions.Count);
+            percactions = new List<double>(actions.Count);
+            for (int i = 0; i < actions.Count; i++)
+            {
+                nbactions.Add(0);
+                percactions.Add(0);
+            }
+            
+            
+
+
+
         }
+
+        public void Updatepercactions()
+        {
+            for(int i = 0; i < actions.Count; i++)
+            {
+                percactions[i] = (nbactions[i] * actions[i].price) / total * 100;
+                //Console.WriteLine(actions[i].name + ": " + percactions[i] + "%");
+            }
+        }
+
+
+        public  void Charmaker(System.Windows.Forms.DataVisualization.Charting.Chart chart)
+        {
+            
+            chart.Series["Series1"].Points.Clear();
+            for(int i =0; i < actions.Count;i++)
+            {
+                
+                if (percactions[i] != 0)
+                {
+                    chart.Series["Series1"].Points.AddY(percactions[i].ToString());
+                    chart.Series["Series1"].Points[chart.Series["Series1"].Points.Count()-1].Label = actions[i].name;
+                }
+            }
+        
+        
+        
+        }
+
+        
+
+        
     }
 
 
