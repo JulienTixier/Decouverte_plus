@@ -33,13 +33,14 @@ namespace Decouverte
             actions.Add(LVMH);
             actions.Add(TotalEnergies);
             actions.Add(Sanofi);
+            tree_actionslist.Nodes.Add("Actions");
             for(int i=0; i<actions.Count; i++)
             {
-                actionslist.Items.Add(actions[i].name);
-                
+                tree_actionslist.Nodes[0].Nodes.Add(actions[i].name);
             }
             portf.UpdateConstr();
 
+            
 
         }
 
@@ -72,7 +73,17 @@ namespace Decouverte
         {
             string strnombres_actions = nbactions.Text;
             int nb_actions = Convert.ToInt32(strnombres_actions);
-            string nom_actions = actionslist.SelectedItem.ToString();
+            string nom_actions = "";
+            for (int i = 0; i < tree_actionslist.Nodes.Count; i++)
+            {
+                for (int j =0; j < tree_actionslist.Nodes[i].Nodes.Count; j++)
+                
+                if (tree_actionslist.Nodes[i].Nodes[j].IsSelected == true)
+                {
+                        nom_actions = tree_actionslist.Nodes[i].Nodes[j].Text.ToString();
+                }
+            }
+            
             portf.total = 0;
             for (int i =0;i < portf.actions.Count; i++)
             {
@@ -101,14 +112,6 @@ namespace Decouverte
 
 
 
-
-
-
-
-
-
-
-
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -124,6 +127,20 @@ namespace Decouverte
         private void chart1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void tree_actionslist_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
+        }
+        private void tree_actionslist_NodeClick(object sender, TreeViewEventArgs e)
+        {
+            Console.WriteLine("Waouh t'as double click sur une action maitenant il faut ouvrir un bloc avec toutes les informations");
         }
     }
 
