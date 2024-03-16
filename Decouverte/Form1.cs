@@ -39,19 +39,20 @@ namespace Decouverte
                 tree_actionslist.Nodes[0].Nodes.Add(actions[i].name);
             }
             portf.UpdateConstr();
+            info1.Hide();
 
-            
+
 
         }
-
+        public int i = 0;
         public static List<Actions> actions = new List<Actions>();
-        public Actions Thales = new Actions("Thales", /*134*/10);
-        public Actions Schneider = new Actions("Schneider", /*195*/10);
-        public Actions Vinci = new Actions("Vinci", /*116*/10);
-        public Actions LVMH = new Actions("LVMH", /*822*/10);
-        public Actions TotalEnergies = new Actions("TotalEnergies", /*60*/10);
-        public Actions Sanofi = new Actions("Sanofi", /*86*/10);
-        public Portefeuille portf = new Portefeuille(0, actions);
+        public Actions Thales = new Actions("Thales", 134);
+        public Actions Schneider = new Actions("Schneider", 195);
+        public Actions Vinci = new Actions("Vinci", 116);
+        public Actions LVMH = new Actions("LVMH", 822);
+        public Actions TotalEnergies = new Actions("TotalEnergies", 60);
+        public Actions Sanofi = new Actions("Sanofi", 86);
+        public Portefeuille portf = new Portefeuille(actions);
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -71,23 +72,10 @@ namespace Decouverte
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string strnombres_actions = nbactions.Text;
-            int nb_actions = Convert.ToInt32(strnombres_actions);
-            string nom_actions = "";
-            for (int i = 0; i < tree_actionslist.Nodes.Count; i++)
-            {
-                for (int j =0; j < tree_actionslist.Nodes[i].Nodes.Count; j++)
-                
-                if (tree_actionslist.Nodes[i].Nodes[j].IsSelected == true)
-                {
-                        nom_actions = tree_actionslist.Nodes[i].Nodes[j].Text.ToString();
-                }
-            }
-            
-            portf.total = 0;
+            int nb_actions = Convert.ToInt32(nbactions.Text);
             for (int i =0;i < portf.actions.Count; i++)
             {
-                if(nom_actions == portf.actions[i].name)
+                if(nom.Text == portf.actions[i].name)
                 {
                     if (portf.nbactions[i] == 0)
                     {
@@ -136,11 +124,45 @@ namespace Decouverte
 
         private void tree_actionslist_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            for (int i = 0; i < tree_actionslist.Nodes.Count; i++)
+            {
+                for (int j = 0; j < tree_actionslist.Nodes[i].Nodes.Count; j++)
+                {
+                    
+                    if (tree_actionslist.Nodes[i].Nodes[j].IsSelected == true)
+                    {
+                        info1.Show();
+                        nom.Text = tree_actionslist.Nodes[i].Nodes[j].Text.ToString();
+                    }
+                }
+            }
+            for (int i = 0; i < portf.actions.Count; i++)
+            {
+                if (nom.Text == portf.actions[i].name)
+                {
+                    prix.Text = portf.actions[i].price.ToString() + "€";
+                }
+            }
+        }
+
+        private void label1_Click_1(object sender, EventArgs e)
+        {
 
         }
-        private void tree_actionslist_NodeClick(object sender, TreeViewEventArgs e)
+
+        private void prix_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Waouh t'as double click sur une action maitenant il faut ouvrir un bloc avec toutes les informations");
+
+        }
+
+        private void valportefeuillestr_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exit_info1_Click(object sender, EventArgs e)
+        {
+            info1.Hide();
         }
     }
 
@@ -175,7 +197,7 @@ namespace Decouverte
         public List<Actions> actions;
         public List<double> percactions;
 
-        public Portefeuille(float tot,List<Actions> acts)
+        public Portefeuille(List<Actions> acts, float tot = 0)
         {
             total = tot;
             actions = acts;
