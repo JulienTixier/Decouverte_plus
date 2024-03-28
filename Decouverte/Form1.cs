@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 namespace Decouverte
 {
 
@@ -27,6 +28,8 @@ namespace Decouverte
         {
             InitializeComponent();
             valportefeuillestr.Text = "0€";
+            totversements.Text = "0€";
+            aff_benef.Text = "0€";
             actions.Add(Thales);
             actions.Add(Schneider);
             actions.Add(Vinci);
@@ -40,6 +43,8 @@ namespace Decouverte
             }
             portf.UpdateConstr();
             info1.Hide();
+            info2.Hide();
+            info3.Hide();
 
 
 
@@ -54,116 +59,153 @@ namespace Decouverte
         public Actions Sanofi = new Actions("Sanofi", 86);
         public Portefeuille portf = new Portefeuille(actions);
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-         
 
+
+        private void nbactions1_KeyPress(object sender, KeyPressEventArgs e)
+        { //gestion des erreurs pour qu'il y a que des entiers en entrées
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {//Iscontrol c'est les touches "spéciales" du clavier, Isdigit c'est les chiffres
+               
+                e.Handled = true; //empêche d'écrire
+            }
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void nbactions2_KeyPress(object sender, KeyPressEventArgs e)
         {
-          
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
         }
 
-        private void nbactions_TextChanged(object sender, EventArgs e)
+        private void nbactions3_KeyPress(object sender, KeyPressEventArgs e)
         {
-
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
         }
+
+
+
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int nb_actions = Convert.ToInt32(nbactions.Text);
-            for (int i =0;i < portf.actions.Count; i++)
+            
+            if(nbactions1.Text != "") //gère l'erreur d'un ajout vide
             {
-                if(nom.Text == portf.actions[i].name)
+                int nb_actions = Convert.ToInt32(nbactions1.Text);
+                if (nb_actions != 0) //gère l'erreur du 0 pour la répartition la première fois
                 {
-                    if (portf.nbactions[i] == 0)
+                    float montant_ajout = 0;
+                    for (int i = 0; i < portf.actions.Count(); i++)
                     {
-                        portf.nbactions[i] += nb_actions;
-                        portefeuille.Items.Add(portf.nbactions[i] + " " + portf.actions[i].name);
+                        if (nom1.Text == portf.actions[i].name)
+                        {
+                            montant_ajout = nb_actions * portf.actions[i].price;
+                        }
                     }
-                    else
+                    DialogResult reponse = MessageBox.Show("Voulez-vous ajoutez " + nb_actions + " actions " + nom1.Text + " à votre portefeuille pour un montant de " + montant_ajout + "€ ?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (reponse == DialogResult.Yes)
                     {
-                        portefeuille.Items.Remove(portf.nbactions[i] + " " + portf.actions[i].name);
-                        portf.nbactions[i] += nb_actions;
-                        portefeuille.Items.Add(portf.nbactions[i] + " " + portf.actions[i].name);
-
+                        portf.Addactions(nom1, nb_actions, nb_actifs_portefeuille, portefeuille, portefeuille_prix, valportefeuillestr, totversements, aff_benef, repartactifs);
                     }
-
                 }
-                portf.total += portf.actions[i].price * portf.nbactions[i];
+                
             }
-            valportefeuillestr.Text = portf.total.ToString() + "€";
-            portf.Updatepercactions();
-            portf.Charmaker(repartactifs);
-
-
-
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
             
         }
-
-        private void portefeuille_SelectedIndexChanged(object sender, EventArgs e)
+        private void add2_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void chart1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void tree_actionslist_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            for (int i = 0; i < tree_actionslist.Nodes.Count; i++)
+            
+            int nb_actions = Convert.ToInt32(nbactions2.Text);
+            float montant_ajout = -1;
+            for (int i = 0; i < portf.actions.Count(); i++)
             {
-                for (int j = 0; j < tree_actionslist.Nodes[i].Nodes.Count; j++)
+                if (nom2.Text == portf.actions[i].name)
                 {
-                    
-                    if (tree_actionslist.Nodes[i].Nodes[j].IsSelected == true)
-                    {
-                        info1.Show();
-                        nom.Text = tree_actionslist.Nodes[i].Nodes[j].Text.ToString();
-                    }
+                    montant_ajout = nb_actions * portf.actions[i].price;
                 }
             }
-            for (int i = 0; i < portf.actions.Count; i++)
+            DialogResult reponse = MessageBox.Show("Voulez-vous ajoutez " + nb_actions + " actions " + nom2.Text + " à votre portefeuille pour un montant de " + montant_ajout + "€ ?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (reponse == DialogResult.Yes)
             {
-                if (nom.Text == portf.actions[i].name)
-                {
-                    prix.Text = portf.actions[i].price.ToString() + "€";
-                }
+                portf.Addactions(nom2, nb_actions,nb_actifs_portefeuille, portefeuille, portefeuille_prix, valportefeuillestr, totversements, aff_benef, repartactifs);
             }
         }
 
-        private void label1_Click_1(object sender, EventArgs e)
+        private void add3_Click(object sender, EventArgs e)
         {
-
+            int nb_actions = Convert.ToInt32(nbactions3.Text);
+            float montant_ajout = -1;
+            for (int i = 0; i < portf.actions.Count(); i++)
+            {
+                if (nom3.Text == portf.actions[i].name)
+                {
+                    montant_ajout = nb_actions * portf.actions[i].price;
+                }
+            }
+            DialogResult reponse = MessageBox.Show("Voulez-vous ajoutez " + nb_actions + " actions " + nom3.Text + " à votre portefeuille pour un montant de " + montant_ajout + "€ ?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (reponse == DialogResult.Yes)
+            {
+                portf.Addactions(nom3, nb_actions,nb_actifs_portefeuille, portefeuille, portefeuille_prix, valportefeuillestr, totversements, aff_benef, repartactifs);
+            }
         }
 
-        private void prix_Click(object sender, EventArgs e)
+        private void Portefeuille_DoubleClick(object sender, EventArgs e)
         {
-
+            
+            for(int i = 0;i < portf.actions.Count(); i++)
+            {
+                if (actions[i].name == portefeuille.SelectedItem.ToString() && actions[i].name != nom1.Text && actions[i].name != nom2.Text && actions[i].name != nom3.Text)
+                {
+                    info1.Show();
+                    nom1.Text = portf.actions[i].name;
+                    prix1.Text = portf.actions[i].price.ToString() + "€";
+                }
+            }
         }
 
-        private void valportefeuillestr_Click(object sender, EventArgs e)
-        {
+      
+       
 
+        private void Tree_actionslist_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            int actpan = 0; //création d'un code binaire comme pour chmod pour faire un switch après
+            if (info1.Visible)
+            {
+                actpan += 1;
+            }
+            if (info2.Visible)
+            {
+                actpan += 2;
+            }
+            if (info3.Visible)
+            {
+                actpan += 4;
+            }
+            portf.AffichageActif(actpan, nbactions1, nbactions2, nbactions3, tree_actionslist, info1, info2, info3, nom1, prix1, nom2, prix2, nom3, prix3);
         }
+
+     
 
         private void exit_info1_Click(object sender, EventArgs e)
         {
             info1.Hide();
         }
+
+        private void exit_info2_Click(object sender, EventArgs e)
+        {
+            info2.Hide();
+        }
+
+        private void exit_info3_Click(object sender, EventArgs e)
+        {
+            info3.Hide();
+        }
+
+ 
+
     }
 
 
@@ -173,84 +215,10 @@ namespace Decouverte
 
 
 
-    public class Actions
-    {
-        public string name;
-        public float price;
-        public Actions(string nom, float prix)
-        {
-            name = nom;
-            price = prix;
-        }
-        public void Updateprice(float prix)
-        {
-            price = prix;
-        }
-
-    }
+    
 
 
-    public class Portefeuille
-    {
-        public double total;
-        public List<int> nbactions;
-        public List<Actions> actions;
-        public List<double> percactions;
-
-        public Portefeuille(List<Actions> acts, float tot = 0)
-        {
-            total = tot;
-            actions = acts;
-        }
-
-        public void UpdateConstr()
-        {
-            nbactions = new List<int>(actions.Count);
-            percactions = new List<double>(actions.Count);
-            for (int i = 0; i < actions.Count; i++)
-            {
-                nbactions.Add(0);
-                percactions.Add(0);
-            }
-            
-            
-
-
-
-        }
-
-        public void Updatepercactions()
-        {
-            for(int i = 0; i < actions.Count; i++)
-            {
-                percactions[i] = (nbactions[i] * actions[i].price) / total * 100;
-                //Console.WriteLine(actions[i].name + ": " + percactions[i] + "%");
-            }
-        }
-
-
-        public  void Charmaker(System.Windows.Forms.DataVisualization.Charting.Chart chart)
-        {
-            
-            chart.Series["Series1"].Points.Clear();
-            for(int i =0; i < actions.Count;i++)
-            {
-                
-                if (percactions[i] != 0)
-                {
-                    chart.Series["Series1"].Points.AddY(percactions[i].ToString());
-                    chart.Series["Series1"].Points[chart.Series["Series1"].Points.Count()-1].Label = actions[i].name;
-                }
-            }
-        
-        
-        
-        }
-
-        
-
-        
-    }
+    
 
 
 
